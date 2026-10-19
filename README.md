@@ -1,7 +1,6 @@
 # Motif
 
-<!-- TODO: demo GIF -->
-Demo video: <!-- TODO: video link -->
+<img src="docs/demo.gif" alt="Hovering a character in a chapter shows her as of that chapter; the Timeline shows everyone's lane across chapters; dragging the Graph's chapter slider changes the relationships" width="860">
 
 <img src="docs/screenshots/hero.png" alt="A chapter open in Obsidian with character names underlined, two writing notes, and the Cast panel showing everyone's state as of this chapter" width="860">
 
