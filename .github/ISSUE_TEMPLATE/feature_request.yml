@@ -1,0 +1,11 @@
+name: Feature idea
+description: Something Motif should do.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like Motif to do?
+      description: The problem you're running into while writing helps more than a specific solution.
+    validations:
+      required: true

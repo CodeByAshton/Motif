@@ -1,0 +1,70 @@
+name: Bug report
+description: Something in Motif doesn't work the way it should.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you expected, and what you got instead. Screenshots help.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open a chapter
+        2. Click Sync chapter
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: motif
+    attributes:
+      label: Motif version
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: obsidian
+    attributes:
+      label: Obsidian version
+      description: Settings → General → Current version.
+      placeholder: "1.8.10"
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: "macOS 15.1, Windows 11, Ubuntu 24.04"
+    validations:
+      required: true
+  - type: dropdown
+    id: provider
+    attributes:
+      label: AI provider
+      options:
+        - Claude Code
+        - Anthropic (API key)
+        - OpenAI
+        - OpenRouter
+        - Ollama
+        - LM Studio
+        - OpenAI-compatible (custom)
+        - None / not AI-related
+    validations:
+      required: true
+  - type: input
+    id: model
+    attributes:
+      label: Model
+      description: If it's AI-related. Sync and AI review depend a lot on the model.
+      placeholder: "claude-sonnet-5-5, llama3.1, ..."
+  - type: textarea
+    id: console
+    attributes:
+      label: Errors from the developer console
+      description: "Optional. Ctrl+Shift+I (Cmd+Option+I on macOS), Console tab. Turn on Settings → Motif → Debug mode for more detail. Please remove any API keys or book text you don't want public."
+      render: text
