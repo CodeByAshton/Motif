@@ -1,11 +1,20 @@
-# Push a version tag that matches manifest.json (e.g. `git tag 0.1.0 && git push origin 0.1.0`, or
-# `npm version patch && git push --follow-tags`) to build, test and publish a GitHub release with
-# main.js, manifest.json and styles.css attached.
+# Publishes a GitHub release with main.js, manifest.json and styles.css attached.
+#
+# - Push a version tag that matches manifest.json (`git tag 0.1.0 && git push origin 0.1.0`, or
+#   `npm version patch && git push --follow-tags`).
+# - Or run it by hand from the Actions tab ("Run workflow") to release the version in manifest.json
+#   from main. Tick "replace" to delete an existing release and tag of that version and rebuild it.
 name: Release
 
 on:
   push:
     tags: ["*"]
+  workflow_dispatch:
+    inputs:
+      replace:
+        description: Replace an existing release of this version
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -21,12 +30,22 @@ jobs:
           node-version: "22.x"
           cache: npm
 
-      - name: Check the tag matches manifest.json
+      - name: Check the version
+        id: v
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           version=$(node -p "require('./manifest.json').version")
-          if [ "$GITHUB_REF_NAME" != "$version" ]; then
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if [ "$GITHUB_EVENT_NAME" = "push" ] && [ "$GITHUB_REF_NAME" != "$version" ]; then
             echo "Tag $GITHUB_REF_NAME doesn't match manifest.json version $version" >&2
             exit 1
+          fi
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] && gh release view "$version" >/dev/null 2>&1; then
+            if [ "${{ inputs.replace }}" != "true" ]; then
+              echo "Release $version already exists. Run again with 'replace' ticked to rebuild it." >&2
+              exit 1
+            fi
           fi
 
       - name: Build and test
@@ -39,4 +58,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "$GITHUB_REF_NAME" --title "Motif $GITHUB_REF_NAME" --generate-notes main.js manifest.json styles.css
+          v="${{ steps.v.outputs.version }}"
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] && gh release view "$v" >/dev/null 2>&1; then
+            gh release delete "$v" --cleanup-tag --yes
+          fi
+          gh release create "$v" --title "Motif $v" --target "$GITHUB_SHA" --generate-notes main.js manifest.json styles.css
