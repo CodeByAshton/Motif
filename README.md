@@ -78,7 +78,7 @@ API keys are stored unencrypted in `.obsidian/plugins/motif/data.json` inside yo
 
 ## Status and known limitations
 
-This is 0.1.0, the first public release.
+This is version 0.1.1, an early release.
 
 - Desktop only. The Claude Code provider needs Node, which Obsidian mobile doesn't have.
 - Not in the community plugins directory yet. Use BRAT or install by hand.

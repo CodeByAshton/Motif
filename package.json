@@ -1,6 +1,6 @@
 {
   "name": "motif",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Motif: an AI writing studio for novelists in Obsidian, with writing tools, a chapter-by-chapter codex and AI review.",
   "main": "main.js",
   "type": "module",
