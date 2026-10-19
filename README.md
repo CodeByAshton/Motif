@@ -2,8 +2,6 @@
 
 <img src="docs/demo.gif" alt="Hovering a character in a chapter shows her as of that chapter; the Timeline shows everyone's lane across chapters; dragging the Graph's chapter slider changes the relationships" width="860">
 
-<img src="docs/screenshots/hero.png" alt="A chapter open in Obsidian with character names underlined, two writing notes, and the Cast panel showing everyone's state as of this chapter" width="860">
-
 You're on chapter 23. Where was Mara in chapter 9? Does Elias know about the ledger yet?
 
 Motif is an Obsidian plugin for keeping track of a novel while you write it. When you finish a chapter, an AI reads it and writes down what changed for each character, like where they are now and what they've found out. Hover any name in the manuscript and you see that character as of the chapter you're in.
