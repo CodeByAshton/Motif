@@ -1,14 +1,11 @@
-# Publishes a GitHub release with main.js, manifest.json and styles.css for the version in manifest.json.
-# Runs when that version's tag is pushed (`npm version patch && git push --follow-tags`), and on pushes
-# to main: if the version in manifest.json has no release yet, it builds, tests and releases it (GitHub
-# creates the tag). Pushes that don't bump the version do nothing.
+# Push a version tag that matches manifest.json (e.g. `git tag 0.1.0 && git push origin 0.1.0`, or
+# `npm version patch && git push --follow-tags`) to build, test and publish a GitHub release with
+# main.js, manifest.json and styles.css attached.
 name: Release
 
 on:
   push:
-    branches: [main]
     tags: ["*"]
-  workflow_dispatch:
 
 permissions:
   contents: write
@@ -19,39 +16,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Work out the version
-        id: v
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          version=$(node -p "require('./manifest.json').version")
-          echo "version=$version" >> "$GITHUB_OUTPUT"
-          if [ "$GITHUB_REF_TYPE" = "tag" ] && [ "$GITHUB_REF_NAME" != "$version" ]; then
-            echo "Tag $GITHUB_REF_NAME doesn't match manifest.json version $version" >&2
-            exit 1
-          fi
-          if gh release view "$version" >/dev/null 2>&1; then
-            echo "Release $version already exists; nothing to do."
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-          fi
-
       - uses: actions/setup-node@v4
-        if: steps.v.outputs.skip != 'true'
         with:
           node-version: "20.x"
           cache: npm
 
+      - name: Check the tag matches manifest.json
+        run: |
+          version=$(node -p "require('./manifest.json').version")
+          if [ "$GITHUB_REF_NAME" != "$version" ]; then
+            echo "Tag $GITHUB_REF_NAME doesn't match manifest.json version $version" >&2
+            exit 1
+          fi
+
       - name: Build and test
-        if: steps.v.outputs.skip != 'true'
         run: |
           npm ci
           npm test
           npm run build
 
       - name: Create release
-        if: steps.v.outputs.skip != 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          v="${{ steps.v.outputs.version }}"
-          gh release create "$v" --title "Motif $v" --target "$GITHUB_SHA" --generate-notes main.js manifest.json styles.css
+          gh release create "$GITHUB_REF_NAME" --title "Motif $GITHUB_REF_NAME" --generate-notes main.js manifest.json styles.css
