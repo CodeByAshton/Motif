@@ -2,12 +2,15 @@
 #
 # - Push a version tag that matches manifest.json (`git tag 0.1.0 && git push origin 0.1.0`, or
 #   `npm version patch && git push --follow-tags`).
-# - Or run it by hand from the Actions tab ("Run workflow") to release the version in manifest.json
-#   from main. Tick "replace" to delete an existing release and tag of that version and rebuild it.
+# - Or bump the version (`npm version patch`) and push main: a push to main whose manifest.json version
+#   has no release yet is released automatically. Pushes that don't change the version do nothing.
+# - Or run it by hand from the Actions tab ("Run workflow"). Tick "replace" to delete an existing
+#   release and tag of that version and rebuild it.
 name: Release
 
 on:
   push:
+    branches: [main]
     tags: ["*"]
   workflow_dispatch:
     inputs:
@@ -37,24 +40,31 @@ jobs:
         run: |
           version=$(node -p "require('./manifest.json').version")
           echo "version=$version" >> "$GITHUB_OUTPUT"
-          if [ "$GITHUB_EVENT_NAME" = "push" ] && [ "$GITHUB_REF_NAME" != "$version" ]; then
+          if [ "$GITHUB_REF_TYPE" = "tag" ] && [ "$GITHUB_REF_NAME" != "$version" ]; then
             echo "Tag $GITHUB_REF_NAME doesn't match manifest.json version $version" >&2
             exit 1
           fi
-          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] && gh release view "$version" >/dev/null 2>&1; then
-            if [ "${{ inputs.replace }}" != "true" ]; then
+          if gh release view "$version" >/dev/null 2>&1; then
+            if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] && [ "${{ inputs.replace }}" = "true" ]; then
+              echo "Replacing release $version."
+            elif [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
               echo "Release $version already exists. Run again with 'replace' ticked to rebuild it." >&2
               exit 1
+            else
+              echo "Release $version already exists; nothing to do."
+              echo "skip=true" >> "$GITHUB_OUTPUT"
             fi
           fi
 
       - name: Build and test
+        if: steps.v.outputs.skip != 'true'
         run: |
           npm ci
           npm test
           npm run build
 
       - name: Create release
+        if: steps.v.outputs.skip != 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
