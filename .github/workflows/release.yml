@@ -1,5 +1,5 @@
 # Push a tag that matches manifest.json's version (e.g. `git tag 0.1.0 && git push origin 0.1.0`)
-# to build, test and attach main.js, manifest.json and styles.css to a draft GitHub release.
+# to build, test and attach main.js, manifest.json and styles.css to a GitHub release.
 name: Release
 
 on:
@@ -36,9 +36,9 @@ jobs:
           npm test
           npm run build
 
-      - name: Create draft release
+      - name: Create release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           tag="${GITHUB_REF#refs/tags/}"
-          gh release create "$tag" --title "$tag" --draft --generate-notes main.js manifest.json styles.css
+          gh release create "$tag" --title "$tag" --generate-notes main.js manifest.json styles.css

@@ -81,7 +81,7 @@ Four views that share one tab bar and swap in place, so they feel like one app.
 
 **Option 2: install with BRAT (automatic updates).**
 1. Install **BRAT** from **Settings → Community plugins → Browse**, and enable it.
-2. Run **BRAT: Add a beta plugin for testing** from the command palette and paste `codebyashton/storyloom`.
+2. Run **BRAT: Add a beta plugin for testing** from the command palette and paste `codebyashton/motif`.
 3. Enable **Motif** under **Settings → Community plugins**. The setup guide takes it from there.
 
 **Option 3: install by hand.**
